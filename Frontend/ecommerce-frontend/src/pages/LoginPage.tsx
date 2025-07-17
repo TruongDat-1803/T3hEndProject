@@ -14,6 +14,8 @@ import { Visibility, VisibilityOff, Lock, Person } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../store/slices/authSlice';
+import authService, { convertBackendUserToFrontend } from '../services/authService';
+import { User } from '../types';
 
 const LoginPage: React.FC = () => {
   const dispatch = useDispatch();
@@ -28,23 +30,23 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await response.json();
-      if (!response.ok || !data.success) {
-        setError(data.message || 'Đăng nhập thất bại.');
-      } else {
-        // Save token and user info
-        localStorage.setItem('token', data.token);
-        dispatch(setUser(data.user));
+      const result = await authService.login({ username, password });
+      
+      if (result.success && result.token && result.user) {
+        // Convert backend user format to frontend format
+        const frontendUser = convertBackendUserToFrontend(result.user);
+        
+        // Store user data and token
+        authService.setUserData(frontendUser, result.token);
+        dispatch(setUser(frontendUser));
         navigate('/');
+      } else {
+        setError(result.message || 'Đăng nhập thất bại.');
       }
-    } catch (err) {
-      setError('Lỗi kết nối đến máy chủ.');
+    } catch (err: any) {
+      setError(err.message || 'Lỗi kết nối đến máy chủ.');
     } finally {
       setLoading(false);
     }

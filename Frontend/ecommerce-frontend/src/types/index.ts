@@ -1,7 +1,7 @@
 // Product Types
 export interface Product {
-  id: number;
-  name: string;
+  productId: number;
+  productName: string;
   description: string;
   price: number;
   originalPrice: number;
@@ -45,13 +45,13 @@ export interface UpdateProductDto {
 }
 
 // Category Types
-export interface Category {
-  id: number;
-  name: string;
+export interface  Category {
+  categoryId: number;
+  categoryName: string;
   description: string;
   parentCategoryId?: number;
   isActive: boolean;
-  createdAt: string;
+  createdDate: string;
   updatedAt: string;
   parentCategory?: Category;
   subCategories?: Category[];
@@ -74,12 +74,12 @@ export interface UpdateCategoryDto {
 
 // Brand Types
 export interface Brand {
-  id: number;
-  name: string;
+  brandId: number;
+  brandName: string;
   description: string;
   logoUrl?: string;
   isActive: boolean;
-  createdAt: string;
+  createdDate: string;
   updatedAt: string;
   products?: Product[];
 }
