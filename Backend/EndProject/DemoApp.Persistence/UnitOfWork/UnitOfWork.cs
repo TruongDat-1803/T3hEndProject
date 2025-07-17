@@ -62,7 +62,10 @@ namespace DemoApp.Persistence.UnitOfWork
             try
             {
                 await _context.SaveChangesAsync();
-                await _transaction?.CommitAsync();
+                if (_transaction != null)
+                {
+                    await _transaction.CommitAsync();
+                }
             }
             catch
             {
@@ -73,7 +76,10 @@ namespace DemoApp.Persistence.UnitOfWork
 
         public async Task RollbackAsync()
         {
-            await _transaction?.RollbackAsync();
+            if (_transaction != null)
+            {
+                await _transaction.RollbackAsync();
+            }
         }
 
         public async Task<int> SaveChangesAsync()

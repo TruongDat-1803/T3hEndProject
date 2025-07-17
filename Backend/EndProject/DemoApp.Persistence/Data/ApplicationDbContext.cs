@@ -10,24 +10,24 @@ namespace DemoApp.Persistence.Data
         }
 
         // DbSet properties
-        public DbSet<User> Users { get; set; }
-        public DbSet<UserRole> UserRoles { get; set; }
-        public DbSet<UserRoleMapping> UserRoleMappings { get; set; }
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<Brand> Brands { get; set; }
-        public DbSet<Product> Products { get; set; }
-        public DbSet<ProductSpecification> ProductSpecifications { get; set; }
-        public DbSet<ProductImage> ProductImages { get; set; }
-        public DbSet<ProductVariant> ProductVariants { get; set; }
-        public DbSet<ShoppingCart> ShoppingCart { get; set; }
-        public DbSet<Address> Addresses { get; set; }
-        public DbSet<Order> Orders { get; set; }
-        public DbSet<OrderItem> OrderItems { get; set; }
-        public DbSet<ProductReview> ProductReviews { get; set; }
-        public DbSet<Wishlist> Wishlist { get; set; }
-        public DbSet<Coupon> Coupons { get; set; }
-        public DbSet<OrderCoupon> OrderCoupons { get; set; }
-        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<User>? Users { get; set; }
+        public DbSet<UserRole>? UserRoles { get; set; }
+        public DbSet<UserRoleMapping>? UserRoleMappings { get; set; }
+        public DbSet<Category>? Categories { get; set; }
+        public DbSet<Brand>? Brands { get; set; }
+        public DbSet<Product>? Products { get; set; }
+        public DbSet<ProductSpecification>? ProductSpecifications { get; set; }
+        public DbSet<ProductImage>? ProductImages { get; set; }
+        public DbSet<ProductVariant>? ProductVariants { get; set; }
+        public DbSet<ShoppingCart>? ShoppingCart { get; set; }
+        public DbSet<Address>? Addresses { get; set; }
+        public DbSet<Order>? Orders { get; set; }
+        public DbSet<OrderItem>? OrderItems { get; set; }
+        public DbSet<ProductReview>? ProductReviews { get; set; }
+        public DbSet<Wishlist>? Wishlist { get; set; }
+        public DbSet<Coupon>? Coupons { get; set; }
+        public DbSet<OrderCoupon>? OrderCoupons { get; set; }
+        public DbSet<Notification>? Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
