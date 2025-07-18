@@ -115,18 +115,11 @@ namespace DemoApp.Persistence.Data
             {
                 entity.HasKey(e => e.ProductId);
                 entity.Property(e => e.ProductName).IsRequired().HasMaxLength(200);
-                entity.Property(e => e.ShortDescription).HasMaxLength(500);
-                entity.Property(e => e.SKU).IsRequired().HasMaxLength(50);
-                entity.Property(e => e.Price).HasColumnType("decimal(18,2)");
-                entity.Property(e => e.OriginalPrice).HasColumnType("decimal(18,2)");
-                entity.Property(e => e.DiscountPercentage).HasColumnType("decimal(5,2)");
-                entity.Property(e => e.Weight).HasColumnType("decimal(10,2)");
-                entity.Property(e => e.Dimensions).HasMaxLength(100);
-                
-                entity.HasIndex(e => e.SKU).IsUnique();
+                entity.Property(e => e.Description);
                 entity.HasIndex(e => e.CategoryId);
                 entity.HasIndex(e => e.BrandId);
                 entity.HasIndex(e => e.IsActive);
+                entity.HasIndex(e => e.Price);
                 entity.HasIndex(e => e.IsFeatured);
                 
                 entity.HasOne(e => e.Category)
@@ -144,9 +137,9 @@ namespace DemoApp.Persistence.Data
             modelBuilder.Entity<ProductSpecification>(entity =>
             {
                 entity.HasKey(e => e.SpecificationId);
-                entity.Property(e => e.SpecificationType).IsRequired().HasMaxLength(50);
-                entity.Property(e => e.SpecificationName).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.SpecificationValue).IsRequired().HasMaxLength(500);
+                entity.Property(e => e.KichThuocMH).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.CongNgheMH).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.CameraSauChinh).IsRequired().HasMaxLength(500);
                 
                 entity.HasOne(e => e.Product)
                     .WithMany(p => p.Specifications)
@@ -171,8 +164,8 @@ namespace DemoApp.Persistence.Data
             modelBuilder.Entity<ProductVariant>(entity =>
             {
                 entity.HasKey(e => e.VariantId);
-                entity.Property(e => e.VariantName).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.VariantValue).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.PhienBan).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.MauSac).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.PriceAdjustment).HasColumnType("decimal(18,2)");
                 
                 entity.HasOne(e => e.Product)

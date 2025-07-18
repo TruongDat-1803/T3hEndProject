@@ -29,8 +29,6 @@ namespace DemoApp.Application.Services
             var product = await _unitOfWork.Products.GetByIdAsync(id);
             if (product == null) return null;
 
-            // Increment view count
-            product.IncrementViewCount();
             await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<ProductDto>(product);
@@ -38,16 +36,8 @@ namespace DemoApp.Application.Services
 
         public async Task<ProductDto?> GetProductBySkuAsync(string sku)
         {
-            var products = await _unitOfWork.Products.FindAsync(p => p.SKU == sku);
-            var product = products.FirstOrDefault();
-            
-            if (product == null) return null;
-
-            // Increment view count
-            product.IncrementViewCount();
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<ProductDto>(product);
+            // This method is obsolete as SKU is no longer part of the Product entity/table.
+            throw new NotImplementedException("SKU is no longer supported in the Product entity.");
         }
 
         public async Task<IEnumerable<ProductDto>> GetProductsByCategoryAsync(int categoryId)
@@ -68,21 +58,15 @@ namespace DemoApp.Application.Services
                 return Enumerable.Empty<ProductDto>();
 
             var products = await _unitOfWork.Products.FindAsync(p => 
-                p.IsActive && 
+                p.IsActive == true && 
                 (p.ProductName.Contains(searchTerm) || 
-                 p.Description!.Contains(searchTerm) || 
-                 p.SKU.Contains(searchTerm)));
+                 (p.Description != null && p.Description.Contains(searchTerm))));
 
             return _mapper.Map<IEnumerable<ProductDto>>(products);
         }
 
         public async Task<ProductDto> CreateProductAsync(CreateProductDto createProductDto)
         {
-            // Validate SKU uniqueness
-            var existingProduct = await _unitOfWork.Products.FindAsync(p => p.SKU == createProductDto.SKU);
-            if (existingProduct.Any())
-                throw new InvalidOperationException($"Product with SKU '{createProductDto.SKU}' already exists.");
-
             // Validate category exists
             var category = await _unitOfWork.Categories.GetByIdAsync(createProductDto.CategoryId);
             if (category == null)
@@ -108,14 +92,6 @@ namespace DemoApp.Application.Services
             var product = await _unitOfWork.Products.GetByIdAsync(id);
             if (product == null)
                 throw new InvalidOperationException($"Product with ID {id} not found.");
-
-            // Validate SKU uniqueness if changed
-            if (updateProductDto.SKU != product.SKU)
-            {
-                var existingProduct = await _unitOfWork.Products.FindAsync(p => p.SKU == updateProductDto.SKU);
-                if (existingProduct.Any())
-                    throw new InvalidOperationException($"Product with SKU '{updateProductDto.SKU}' already exists.");
-            }
 
             // Validate category exists if changed
             if (updateProductDto.CategoryId != product.CategoryId)
@@ -164,7 +140,7 @@ namespace DemoApp.Application.Services
             var product = await _unitOfWork.Products.GetByIdAsync(productId);
             if (product == null) return false;
 
-            product.StockQuantity = Math.Max(0, product.StockQuantity + quantity);
+
             product.UpdatedDate = DateTime.UtcNow;
 
             await _unitOfWork.Products.UpdateAsync(product);

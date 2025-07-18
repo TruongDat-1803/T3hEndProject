@@ -10,15 +10,39 @@ namespace DemoApp.Domain.Entities
         
         [Required]
         [StringLength(50)]
-        public string SpecificationType { get; set; } = string.Empty; // 'Display', 'Processor', 'RAM', etc.
+        public string KichThuocMH { get; set; } = string.Empty; // 'Display', 'Processor', 'RAM', etc.
         
         [Required]
         [StringLength(100)]
-        public string SpecificationName { get; set; } = string.Empty;
+        public string CongNgheMH { get; set; } = string.Empty;
         
         [Required]
         [StringLength(500)]
-        public string SpecificationValue { get; set; } = string.Empty;
+        public string CameraSauChinh { get; set; } = string.Empty;
+        
+        [StringLength(500)]
+        public string? CameraSauPhu { get; set; } = string.Empty;
+        
+        [StringLength(500)]
+        public string? CameraTruoc { get; set; } = string.Empty;
+        
+        [StringLength(100)]
+        public string? Chipset { get; set; } = string.Empty;
+        
+        [StringLength(100)]
+        public string? HeDieuHanh { get; set; } = string.Empty;
+        
+        [StringLength(100)]
+        public string? TheSim { get; set; } = string.Empty;
+        
+        [StringLength(100)]
+        public string? DoPhanGiaiMH { get; set; } = string.Empty;
+        
+        [StringLength(100)]
+        public string? LoaiCPU { get; set; } = string.Empty;
+        
+        [StringLength(100)]
+        public string? Pin { get; set; } = string.Empty;
         
         public int DisplayOrder { get; set; } = 0;
 

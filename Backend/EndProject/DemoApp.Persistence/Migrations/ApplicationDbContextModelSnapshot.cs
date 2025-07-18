@@ -433,7 +433,7 @@ namespace DemoApp.Persistence.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsFeatured")
+                    b.Property<bool>("Price")
                         .HasColumnType("bit");
 
                     b.Property<decimal?>("OriginalPrice")
@@ -476,7 +476,7 @@ namespace DemoApp.Persistence.Migrations
 
                     b.HasIndex("IsActive");
 
-                    b.HasIndex("IsFeatured");
+                    b.HasIndex("Price");
 
                     b.HasIndex("SKU")
                         .IsUnique();
@@ -582,17 +582,17 @@ namespace DemoApp.Persistence.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<string>("SpecificationName")
+                    b.Property<string>("CongNgheMH")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("SpecificationType")
+                    b.Property<string>("KichThuocMH")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("SpecificationValue")
+                    b.Property<string>("CameraSauChinh")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -629,7 +629,7 @@ namespace DemoApp.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("VariantValue")
+                    b.Property<string>("MauSac")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");

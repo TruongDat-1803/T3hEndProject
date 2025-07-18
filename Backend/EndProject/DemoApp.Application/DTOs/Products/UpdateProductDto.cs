@@ -43,6 +43,5 @@ namespace DemoApp.Application.DTOs.Products
         public string? Dimensions { get; set; }
         
         public bool IsActive { get; set; } = true;
-        public bool IsFeatured { get; set; } = false;
     }
 } 

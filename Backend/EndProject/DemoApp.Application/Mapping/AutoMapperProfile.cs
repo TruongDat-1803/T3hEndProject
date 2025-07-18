@@ -58,10 +58,9 @@ namespace DemoApp.Application.Mapping
             // Order mappings
             CreateMap<Order, OrderDto>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.FullName));
-            
+
             CreateMap<OrderItem, OrderItemDto>()
-                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.ProductName))
-                .ForMember(dest => dest.SKU, opt => opt.MapFrom(src => src.Product.SKU));
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.ProductName));
 
             CreateMap<ShoppingCart, ShoppingCartDto>().ReverseMap();
             CreateMap<AddToCartDto, ShoppingCart>();

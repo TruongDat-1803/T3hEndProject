@@ -5,51 +5,28 @@ namespace DemoApp.Domain.Entities
     public class Product
     {
         public int ProductId { get; set; }
-        
+
         [Required]
         [StringLength(200)]
         public string ProductName { get; set; } = string.Empty;
-        
+
         public string? Description { get; set; }
-        
-        [StringLength(500)]
-        public string? ShortDescription { get; set; }
-        
+
         public int CategoryId { get; set; }
-        
+
         public int BrandId { get; set; }
-        
-        [Required]
-        [StringLength(50)]
-        public string SKU { get; set; } = string.Empty;
-        
-        [Required]
-        [Range(0, double.MaxValue)]
-        public decimal Price { get; set; }
-        
-        [Range(0, double.MaxValue)]
-        public decimal? OriginalPrice { get; set; }
-        
-        [Range(0, 100)]
-        public decimal DiscountPercentage { get; set; } = 0;
-        
-        public int StockQuantity { get; set; } = 0;
-        
-        [Range(0, double.MaxValue)]
-        public decimal? Weight { get; set; }
-        
-        [StringLength(100)]
-        public string? Dimensions { get; set; }
-        
+
+        public int? StockQuantity { get; set; }
+
         public bool IsActive { get; set; } = true;
-        
+
+        public decimal Price { get; set; }
+
+        public DateTime? CreatedDate { get; set; }
+
+        public DateTime? UpdatedDate { get; set; }
         public bool IsFeatured { get; set; } = false;
-        
-        public int ViewCount { get; set; } = 0;
-        
-        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-        
-        public DateTime UpdatedDate { get; set; } = DateTime.UtcNow;
+
 
         // Navigation properties
         public virtual Category Category { get; set; } = null!;
@@ -63,16 +40,7 @@ namespace DemoApp.Domain.Entities
         public virtual ICollection<Wishlist> WishlistItems { get; set; } = new List<Wishlist>();
 
         // Helper methods
-        public decimal FinalPrice => OriginalPrice.HasValue && OriginalPrice.Value > Price 
-            ? Price 
-            : Price;
-        
-        public decimal DiscountAmount => OriginalPrice.HasValue 
-            ? OriginalPrice.Value - Price 
-            : 0;
-        
-        public bool HasDiscount => OriginalPrice.HasValue && OriginalPrice.Value > Price;
-        
+        public decimal FinalPrice => Price;
         public bool IsInStock => StockQuantity > 0;
         
         public string PrimaryImageUrl => Images.FirstOrDefault(i => i.IsPrimary)?.ImageUrl ?? string.Empty;
@@ -83,20 +51,15 @@ namespace DemoApp.Domain.Entities
         
         public int ReviewCount => Reviews.Count(r => r.IsApproved);
         
-        public void IncrementViewCount()
+        
+        public bool HasVariant(string PhienBan, string MauSac)
         {
-            ViewCount++;
-            UpdatedDate = DateTime.UtcNow;
+            return Variants.Any(v => v.PhienBan == PhienBan && v.MauSac == MauSac);
         }
         
-        public bool HasVariant(string variantName, string variantValue)
+        public decimal GetVariantPrice(string PhienBan, string MauSac)
         {
-            return Variants.Any(v => v.VariantName == variantName && v.VariantValue == variantValue);
-        }
-        
-        public decimal GetVariantPrice(string variantName, string variantValue)
-        {
-            var variant = Variants.FirstOrDefault(v => v.VariantName == variantName && v.VariantValue == variantValue);
+            var variant = Variants.FirstOrDefault(v => v.PhienBan == PhienBan && v.MauSac == MauSac);
             return variant?.PriceAdjustment ?? 0;
         }
     }

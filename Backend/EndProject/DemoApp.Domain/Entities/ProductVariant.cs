@@ -10,23 +10,25 @@ namespace DemoApp.Domain.Entities
         
         [Required]
         [StringLength(100)]
-        public string VariantName { get; set; } = string.Empty; // 'Color', 'Storage', 'RAM'
+        public string PhienBan { get; set; } = string.Empty;
         
         [Required]
         [StringLength(100)]
-        public string VariantValue { get; set; } = string.Empty; // 'Red', '256GB', '8GB'
+        public string MauSac { get; set; } = string.Empty;
         
         public decimal PriceAdjustment { get; set; } = 0;
         
         public int StockQuantity { get; set; } = 0;
         
         public bool IsActive { get; set; } = true;
+        
+        public decimal? PriceDisplay { get; set; }
 
         // Navigation properties
         public virtual Product Product { get; set; } = null!;
 
         // Helper methods
-        public decimal FinalPrice => Product.Price + PriceAdjustment;
+        public decimal FinalPrice => PriceDisplay ?? 0;
         
         public bool IsInStock => StockQuantity > 0;
     }

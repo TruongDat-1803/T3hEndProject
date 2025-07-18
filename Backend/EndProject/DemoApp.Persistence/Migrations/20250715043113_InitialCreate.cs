@@ -263,9 +263,9 @@ namespace DemoApp.Persistence.Migrations
                     SpecificationId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<int>(type: "int", nullable: false),
-                    SpecificationType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    SpecificationName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    SpecificationValue = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    KichThuocMH = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CongNgheMH = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CameraSauChinh = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -287,7 +287,7 @@ namespace DemoApp.Persistence.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     VariantName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    VariantValue = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    MauSac = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     PriceAdjustment = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     StockQuantity = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
@@ -604,9 +604,9 @@ namespace DemoApp.Persistence.Migrations
                 column: "IsActive");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_IsFeatured",
+                name: "IX_Products_Price",
                 table: "Products",
-                column: "IsFeatured");
+                column: "Price");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_SKU",

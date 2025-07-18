@@ -21,6 +21,5 @@ namespace DemoApp.Domain.Entities
         
         public decimal CurrentPrice => Product.FinalPrice;
         
-        public bool HasDiscount => Product.HasDiscount;
     }
 } 
