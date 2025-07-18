@@ -184,7 +184,7 @@ const Header: React.FC = () => {
               onClick={() => navigate('/cart')}
               sx={{ display: 'flex', alignItems: 'center', textTransform: 'none', fontWeight: 500 }}
               startIcon={
-                <Badge badgeContent={totalItems} color="secondary">
+                <Badge badgeContent={totalItems} color="error" showZero>
                   <CartIcon />
                 </Badge>
               }
