@@ -124,7 +124,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <AppBar position="sticky" elevation={1} sx={{ bgcolor: 'primary.main' }}>
+    <AppBar position="sticky" elevation={1} sx={{ bgcolor: 'primary.main', borderRadius: 0 }}> {/* bỏ border radius */}
       <Container maxWidth="xl">
         <Toolbar sx={{ justifyContent: 'space-between', gap: 2, minHeight: 64 }}>
           {/* Left side */}
@@ -138,7 +138,7 @@ const Header: React.FC = () => {
                 fontWeight: 'bold',
                 color: 'white',
                 letterSpacing: 1,
-                ml: '140px', // dịch sang phải 145px
+                ml: '140px', // dịch sang phải 140px
               }}
               onClick={() => navigate('/')}
             >

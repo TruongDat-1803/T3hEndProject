@@ -1,160 +1,387 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   Container,
+  Grid,
   Typography,
+  Button,
   Card,
   CardContent,
-  CardMedia,
-  Button,
-  CircularProgress,
-  Alert,
   Chip,
+  Rating,
+  TextField,
   Divider,
+  Tabs,
+  Tab,
+  List,
+  ListItem,
+  ListItemText,
   IconButton,
+  Badge,
+  Alert,
+  CircularProgress,
+  Breadcrumbs,
+  Link,
 } from '@mui/material';
-import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
+import {
+  ShoppingCart,
+  Favorite,
+  FavoriteBorder,
+  Share,
+  Star,
+  StarBorder,
+  Add,
+  Remove,
+  Visibility,
+} from '@mui/icons-material';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from '../store';
+import { addToCart } from '../store/slices/cartSlice';
 import productService from '../services/productService';
-import cartService from '../services/cartService';
-import { Product } from '../types';
+import { Product, ProductReview } from '../types';
 
-const ProductDetailPage = () => {
-  const { id } = useParams<{ id: string }>();
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`product-tabpanel-${index}`}
+      aria-labelledby={`product-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+    </div>
+  );
+}
+
+const ProductDetailPage: React.FC = () => {
+  const { productId } = useParams<{ productId: string }>();
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
   const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [cartError, setCartError] = useState<string | null>(null);
-  const [imgIdx, setImgIdx] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [tabValue, setTabValue] = useState(0);
+  const [isWishlisted, setIsWishlisted] = useState(false);
 
   useEffect(() => {
-    if (!id) return;
-    setLoading(true);
-    setError(null);
-    productService.getProductById(id)
-      .then(setProduct)
-      .catch(() => setError('Không thể tải chi tiết sản phẩm.'))
-      .finally(() => setLoading(false));
-  }, [id]);
+    const fetchProduct = async () => {
+      if (!productId) return;
+      
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await productService.getProductById(productId);
+        setProduct(data);
+      } catch (err: any) {
+        setError('Không thể tải thông tin sản phẩm.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleAddToCart = async () => {
-    setCartError(null);
-    setSuccess(null);
+    fetchProduct();
+  }, [productId]);
+
+  const handleAddToCart = () => {
     if (!product) return;
-    try {
-      await cartService.addToCart({ productId: product.productId, quantity: 1 });
-      setSuccess('Đã thêm vào giỏ hàng!');
-    } catch {
-      setCartError('Không thể thêm vào giỏ hàng.');
+    
+    if (isAuthenticated) {
+      dispatch(addToCart({ productId: product.productId, quantity }));
+    } else {
+      navigate('/login');
     }
   };
 
-  const images = product?.images || [];
-  const currentImage = images[imgIdx]?.imageUrl || '/images/placeholder.jpg';
+  const handleWishlistToggle = () => {
+    setIsWishlisted(!isWishlisted);
+    // TODO: Implement wishlist API call
+  };
+
+  const handleQuantityChange = (increment: boolean) => {
+    if (increment) {
+      setQuantity(prev => Math.min(prev + 1, product?.stockQuantity || 1));
+    } else {
+      setQuantity(prev => Math.max(prev - 1, 1));
+    }
+  };
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
 
   if (loading) {
     return (
-      <Container maxWidth="md" sx={{ py: 8 }}>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
           <CircularProgress />
         </Box>
       </Container>
     );
   }
-  if (error) {
+
+  if (error || !product) {
     return (
-      <Container maxWidth="md" sx={{ py: 8 }}>
-        <Alert severity="error">{error}</Alert>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Alert severity="error">{error || 'Sản phẩm không tồn tại.'}</Alert>
       </Container>
     );
   }
-  if (!product) {
-    return null;
-  }
+
+  const averageRating = product.reviews && product.reviews.length > 0
+    ? product.reviews.reduce((sum, review) => sum + review.rating, 0) / product.reviews.length
+    : 0;
 
   return (
-    <Container maxWidth="md" sx={{ py: 8 }}>
-      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
-        <Box sx={{ flex: 1, minWidth: 280 }}>
-          <Card>
-            <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {images.length > 1 && (
-                <IconButton
-                  onClick={() => setImgIdx((imgIdx - 1 + images.length) % images.length)}
-                  sx={{ position: 'absolute', left: 8, zIndex: 1 }}
-                  size="small"
-                >
-                  <ArrowBackIos fontSize="small" />
-                </IconButton>
-              )}
-              <CardMedia
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      {/* Breadcrumbs */}
+      <Breadcrumbs sx={{ mb: 3 }}>
+        <Link color="inherit" href="/" underline="hover">
+          Trang chủ
+        </Link>
+        <Link color="inherit" href="/products" underline="hover">
+          Sản phẩm
+        </Link>
+        <Typography color="text.primary">{product.productName}</Typography>
+      </Breadcrumbs>
+
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+        {/* Product Images */}
+        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 50%' }, minWidth: 0 }}>
+          <Box sx={{ position: 'relative' }}>
+            {/* Main Image */}
+            <Card sx={{ mb: 2 }}>
+              <Box
                 component="img"
-                height="340"
-                image={currentImage}
+                src={product.images?.[selectedImage]?.imageUrl || '/images/placeholder.jpg'}
                 alt={product.productName}
-                sx={{ objectFit: 'contain', bgcolor: '#fafafa' }}
+                sx={{
+                  width: '100%',
+                  height: 400,
+                  objectFit: 'cover',
+                  borderRadius: 1,
+                }}
               />
-              {images.length > 1 && (
-                <IconButton
-                  onClick={() => setImgIdx((imgIdx + 1) % images.length)}
-                  sx={{ position: 'absolute', right: 8, zIndex: 1 }}
-                  size="small"
-                >
-                  <ArrowForwardIos fontSize="small" />
-                </IconButton>
-              )}
-            </Box>
-          </Card>
-        </Box>
-        <Box sx={{ flex: 2 }}>
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
-            {product.productName}
-          </Typography>
-          <Typography variant="body1" color="text.secondary" gutterBottom>
-            {product.category?.categoryName} {product.brand?.brandName ? `- ${product.brand.brandName}` : ''}
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-            <Typography variant="h5" color="primary" fontWeight="bold">
-              {product.price.toLocaleString('vi-VN')}đ
-            </Typography>
-            {product.originalPrice > product.price && (
-              <Typography variant="body1" color="text.secondary" sx={{ textDecoration: 'line-through' }}>
-                {product.originalPrice.toLocaleString('vi-VN')}đ
-              </Typography>
-            )}
-            {product.discountPercentage > 0 && (
-              <Chip label={`-${product.discountPercentage}%`} color="error" />
-            )}
-          </Box>
-          <Typography variant="body2" color={product.stockQuantity > 0 ? 'success.main' : 'error.main'} sx={{ mb: 1 }}>
-            {product.stockQuantity > 0 ? 'Còn hàng' : 'Hết hàng'}
-          </Typography>
-          {cartError && <Alert severity="error" sx={{ mb: 2 }}>{cartError}</Alert>}
-          {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
-          <Button variant="contained" size="large" sx={{ mb: 2 }} onClick={handleAddToCart} disabled={product.stockQuantity < 1}>
-            Thêm vào giỏ hàng
-          </Button>
-          <Divider sx={{ my: 2 }} />
-          <Typography variant="h6" gutterBottom>Mô tả sản phẩm</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {product.description || 'Không có mô tả.'}
-          </Typography>
-          {product.specifications && product.specifications.length > 0 && (
-            <>
-              <Typography variant="h6" gutterBottom>Thông số kỹ thuật</Typography>
-              <Box component="ul" sx={{ pl: 3, mb: 2 }}>
-                {product.specifications.map((spec) => (
-                  <li key={spec.id}>
-                    <Typography variant="body2">
-                      <strong>{spec.specificationName}:</strong> {spec.specificationValue}
-                    </Typography>
-                  </li>
+            </Card>
+
+            {/* Thumbnail Images */}
+            {product.images && product.images.length > 1 && (
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                {product.images.map((image, index) => (
+                  <Box
+                    key={index}
+                    component="img"
+                    src={image.imageUrl}
+                    alt={`${product.productName} ${index + 1}`}
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      objectFit: 'cover',
+                      borderRadius: 1,
+                      cursor: 'pointer',
+                      border: selectedImage === index ? '2px solid primary.main' : '2px solid transparent',
+                      '&:hover': {
+                        border: '2px solid primary.main',
+                      },
+                    }}
+                    onClick={() => setSelectedImage(index)}
+                  />
                 ))}
               </Box>
-            </>
-          )}
+            )}
+          </Box>
         </Box>
+
+        {/* Product Info */}
+        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 50%' }, minWidth: 0 }}>
+          <Box sx={{ mb: 3 }}>
+            {/* Category & Brand */}
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              {product.category?.categoryName} {product.brand ? `• ${product.brand.brandName}` : ''}
+            </Typography>
+
+            {/* Product Name */}
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
+              {product.productName}
+            </Typography>
+
+            {/* Rating */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+              <Rating value={averageRating} precision={0.5} readOnly />
+              <Typography variant="body2" color="text.secondary">
+                ({product.reviews?.length || 0} đánh giá)
+              </Typography>
+            </Box>
+
+            {/* Price */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+              <Typography variant="h4" color="primary" fontWeight="bold">
+                {product.price.toLocaleString('vi-VN')}đ
+              </Typography>
+              {product.originalPrice > product.price && (
+                <Typography
+                  variant="h6"
+                  color="text.secondary"
+                  sx={{ textDecoration: 'line-through' }}
+                >
+                  {product.originalPrice.toLocaleString('vi-VN')}đ
+                </Typography>
+              )}
+              {product.discountPercentage > 0 && (
+                <Chip
+                  label={`-${product.discountPercentage}%`}
+                  color="error"
+                  size="small"
+                  sx={{ fontWeight: 'bold' }}
+                />
+              )}
+            </Box>
+
+            {/* Stock Status */}
+            <Typography
+              variant="body1"
+              color={product.stockQuantity > 0 ? 'success.main' : 'error.main'}
+              sx={{ mb: 3 }}
+            >
+              {product.stockQuantity > 0 ? 'Còn hàng' : 'Hết hàng'}
+            </Typography>
+
+            {/* Description */}
+            <Typography variant="body1" sx={{ mb: 3 }}>
+              {product.description}
+            </Typography>
+
+            {/* Quantity Selector */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+              <Typography variant="body1">Số lượng:</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: 1 }}>
+                <IconButton
+                  onClick={() => handleQuantityChange(false)}
+                  disabled={quantity <= 1}
+                  size="small"
+                >
+                  <Remove />
+                </IconButton>
+                <TextField
+                  value={quantity}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    if (!isNaN(value) && value > 0 && value <= product.stockQuantity) {
+                      setQuantity(value);
+                    }
+                  }}
+                  sx={{ width: 60, '& .MuiInputBase-input': { textAlign: 'center' } }}
+                  size="small"
+                />
+                <IconButton
+                  onClick={() => handleQuantityChange(true)}
+                  disabled={quantity >= product.stockQuantity}
+                  size="small"
+                >
+                  <Add />
+                </IconButton>
+              </Box>
+            </Box>
+
+            {/* Action Buttons */}
+            <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={<ShoppingCart />}
+                onClick={handleAddToCart}
+                disabled={product.stockQuantity <= 0}
+                sx={{ flex: 1, py: 1.5 }}
+              >
+                Thêm vào giỏ hàng
+              </Button>
+              <IconButton
+                onClick={handleWishlistToggle}
+                sx={{ border: '1px solid #ddd' }}
+              >
+                {isWishlisted ? <Favorite color="error" /> : <FavoriteBorder />}
+              </IconButton>
+              <IconButton sx={{ border: '1px solid #ddd' }}>
+                <Share />
+              </IconButton>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Product Details Tabs */}
+      <Box sx={{ mt: 4 }}>
+        <Tabs value={tabValue} onChange={handleTabChange} aria-label="product details tabs">
+          <Tab label="Mô tả" />
+          <Tab label="Thông số kỹ thuật" />
+          <Tab label="Đánh giá" />
+        </Tabs>
+
+        <TabPanel value={tabValue} index={0}>
+          <Typography variant="body1" sx={{ lineHeight: 1.8 }}>
+            {product.description}
+          </Typography>
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={1}>
+          {product.specifications && product.specifications.length > 0 ? (
+            <List>
+              {product.specifications.map((spec, index) => (
+                <ListItem key={index} divider>
+                  <ListItemText
+                    primary={spec.specificationName}
+                    secondary={spec.specificationValue}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          ) : (
+            <Typography variant="body1" color="text.secondary">
+              Chưa có thông số kỹ thuật.
+            </Typography>
+          )}
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={2}>
+          {product.reviews && product.reviews.length > 0 ? (
+            <Box>
+              {product.reviews.map((review, index) => (
+                <Card key={index} sx={{ mb: 2 }}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                      <Rating value={review.rating} readOnly size="small" />
+                      <Typography variant="body2" color="text.secondary">
+                        {review.user?.firstName} {review.user?.lastName}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {new Date(review.createdAt).toLocaleDateString('vi-VN')}
+                      </Typography>
+                    </Box>
+                    {review.comment && (
+                      <Typography variant="body2">{review.comment}</Typography>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+          ) : (
+            <Typography variant="body1" color="text.secondary">
+              Chưa có đánh giá nào.
+            </Typography>
+          )}
+        </TabPanel>
       </Box>
     </Container>
   );
