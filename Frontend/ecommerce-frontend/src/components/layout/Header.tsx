@@ -19,7 +19,6 @@ import {
   ShoppingCart as CartIcon,
   Person as PersonIcon,
   Menu as MenuIcon,
-  Close as CloseIcon,
 } from '@mui/icons-material';
 import { styled, alpha } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
@@ -31,17 +30,13 @@ import { logoutUser } from '../../store/slices/authSlice';
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  backgroundColor: theme.palette.common.white, // trắng
   '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
+    backgroundColor: alpha(theme.palette.common.white, 0.9),
   },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
-  width: '100%',
-  [theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(3),
-    width: 'auto',
-  },
+  marginLeft: theme.spacing(2),
+  width: '450px', // giảm xuống 450px
+  minWidth: '450px', // giảm xuống 450px
 }));
 
 const SearchIconWrapper = styled('div')(({ theme }) => ({
@@ -52,20 +47,38 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  color: theme.palette.text.primary, // kính lúp màu đen
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
+  color: theme.palette.text.primary, // chữ đen
   '& .MuiInputBase-input': {
     padding: theme.spacing(1, 1, 1, 0),
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create('width'),
     width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: '40ch',
-    },
   },
 }));
+
+// Custom Category Button
+const CategoryButton: React.FC<{ onClick: (e: React.MouseEvent<HTMLElement>) => void }> = ({ onClick }) => (
+  <Button
+    variant="contained"
+    onClick={onClick}
+    sx={{
+      color: 'white',
+      bgcolor: 'rgba(255, 255, 255, 0.2)', // màu nhạt hơn
+      textTransform: 'none',
+      fontWeight: 500,
+      boxShadow: 'none',
+      '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.3)' }, // nhạt hơn khi hover
+      mr: 2,
+    }}
+    startIcon={<MenuIcon />}
+  >
+    Danh mục
+  </Button>
+);
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
@@ -74,22 +87,35 @@ const Header: React.FC = () => {
   const { totalItems } = useSelector((state: RootState) => state.cart) as { totalItems: number };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [categoryAnchorEl, setCategoryAnchorEl] = useState<null | HTMLElement>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // User menu
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-
   const handleLogout = () => {
     dispatch(logoutUser());
     handleMenuClose();
     navigate('/');
   };
 
+  // Category menu
+  const handleCategoryMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setCategoryAnchorEl(event.currentTarget);
+  };
+  const handleCategoryMenuClose = () => {
+    setCategoryAnchorEl(null);
+  };
+  const handleCategorySelect = (category: string) => {
+    navigate(`/products?category=${category}`);
+    handleCategoryMenuClose();
+  };
+
+  // Search
   const handleSearch = (event: React.FormEvent) => {
     event.preventDefault();
     if (searchQuery.trim()) {
@@ -98,87 +124,82 @@ const Header: React.FC = () => {
   };
 
   return (
-    <AppBar position="sticky" elevation={1}>
+    <AppBar position="sticky" elevation={1} sx={{ bgcolor: 'primary.main' }}>
       <Container maxWidth="xl">
-        <Toolbar sx={{ justifyContent: 'space-between' }}>
-          {/* Logo */}
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              color: 'primary.main',
-            }}
-            onClick={() => navigate('/')}
-          >
-            TechStore
-          </Typography>
+        <Toolbar sx={{ justifyContent: 'space-between', gap: 2, minHeight: 64 }}>
+          {/* Left side */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {/* Store Name */}
+            <Typography
+              variant="h5"
+              component="div"
+              sx={{
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                color: 'white',
+                letterSpacing: 1,
+                ml: '140px', // dịch sang phải 145px
+              }}
+              onClick={() => navigate('/')}
+            >
+              Shyphone
+            </Typography>
 
-          {/* Search Bar */}
-          <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
-            <Search>
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <form onSubmit={handleSearch} style={{ width: '100%' }}>
-                <StyledInputBase
-                  placeholder="Tìm kiếm sản phẩm..."
-                  inputProps={{ 'aria-label': 'search' }}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </form>
-            </Search>
+            {/* Category Button */}
+            <CategoryButton onClick={handleCategoryMenuOpen} />
+            <Menu
+              anchorEl={categoryAnchorEl}
+              open={Boolean(categoryAnchorEl)}
+              onClose={handleCategoryMenuClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            >
+              <MenuItem onClick={() => handleCategorySelect('laptops')}>Laptop</MenuItem>
+              <MenuItem onClick={() => handleCategorySelect('phones')}>Điện thoại</MenuItem>
+            </Menu>
+
+            {/* Search Bar */}
+            <Box sx={{ width: '450px', minWidth: '450px' }}> {/* giảm xuống 450px */}
+              <Search>
+                <SearchIconWrapper>
+                  <SearchIcon />
+                </SearchIconWrapper>
+                <form onSubmit={handleSearch} style={{ width: '100%' }}>
+                  <StyledInputBase
+                    placeholder="Tìm kiếm sản phẩm..."
+                    inputProps={{ 'aria-label': 'search' }}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </form>
+              </Search>
+            </Box>
           </Box>
 
-          {/* Navigation */}
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
+          {/* Right side */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mr: '130px' }}> {/* dịch sang trái 140px */}
+            {/* Cart Button with label and icon */}
             <Button
-              color="inherit"
-              onClick={() => navigate('/products')}
-              sx={{ textTransform: 'none' }}
-            >
-              Sản phẩm
-            </Button>
-            <Button
-              color="inherit"
-              onClick={() => navigate('/products?category=laptops')}
-              sx={{ textTransform: 'none' }}
-            >
-              Laptop
-            </Button>
-            <Button
-              color="inherit"
-              onClick={() => navigate('/products?category=phones')}
-              sx={{ textTransform: 'none' }}
-            >
-              Điện thoại
-            </Button>
-          </Box>
-
-          {/* Right side actions */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {/* Cart */}
-            <IconButton
               color="inherit"
               onClick={() => navigate('/cart')}
-              sx={{ position: 'relative' }}
+              sx={{ display: 'flex', alignItems: 'center', textTransform: 'none', fontWeight: 500 }}
+              startIcon={
+                <Badge badgeContent={totalItems} color="secondary">
+                  <CartIcon />
+                </Badge>
+              }
             >
-              <Badge badgeContent={totalItems} color="secondary">
-                <CartIcon />
-              </Badge>
-            </IconButton>
+              Giỏ hàng
+            </Button>
 
-            {/* User menu */}
+            {/* Login/User */}
             {isAuthenticated ? (
               <>
                 <IconButton
                   color="inherit"
                   onClick={handleMenuOpen}
-                  sx={{ ml: 1 }}
                 >
-                  <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
+                  <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main' }}>
                     {user?.firstName?.charAt(0) || 'U'}
                   </Avatar>
                 </IconButton>
@@ -212,7 +233,7 @@ const Header: React.FC = () => {
                 color="inherit"
                 startIcon={<PersonIcon />}
                 onClick={() => navigate('/login')}
-                sx={{ textTransform: 'none' }}
+                sx={{ textTransform: 'none', fontWeight: 500 }}
               >
                 Đăng nhập
               </Button>

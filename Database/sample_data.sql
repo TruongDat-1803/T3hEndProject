@@ -29,14 +29,21 @@ VALUES
 -- === CATEGORIES ===
 INSERT INTO Categories (CategoryName, Description, IsActive, CreatedDate)
 VALUES
-('Laptops', 'All kinds of laptops', 1, GETDATE()),
-('Smartphones', 'All kinds of smartphones', 1, GETDATE());
+(N'Laptop', N'Tất cả các loại laptop', 1, GETDATE()),
+(N'Điện thoại', N'Tất cả các loại điện thoại', 1, GETDATE());
 
 -- === BRANDS ===
 INSERT INTO Brands (BrandName, Description, IsActive, CreatedDate)
 VALUES
-('TechBrand', 'Brand for laptops', 1, GETDATE()),
-('PhoneMaker', 'Brand for smartphones', 1, GETDATE());
+(N'Mac', N'Thương hiệu laptop Mac', 1, GETDATE()),
+(N'Acer', N'Thương hiệu laptop Acer', 1, GETDATE()),
+(N'ASUS', N'Thương hiệu laptop ASUS', 1, GETDATE()),
+(N'Lenovo', N'Thương hiệu laptop Lenovo', 1, GETDATE()),
+(N'Dell', N'Thương hiệu laptop Dell', 1, GETDATE()),
+(N'Iphone', N'Thương hiệu điện thoại Iphone', 1, GETDATE()),
+(N'SamSung', N'Thương hiệu điện thoại SamSung', 1, GETDATE()),
+(N'Xiaomi', N'Thương hiệu điện thoại Xiaomi', 1, GETDATE()),
+(N'Oppo', N'Thương hiệu điện thoại Oppo', 1, GETDATE());
 
 -- === PRODUCTS: Laptops ===
 INSERT INTO Products (ProductName, Description, CategoryId, BrandId, SKU, Price, StockQuantity, IsActive, IsFeatured, CreatedDate)
@@ -65,6 +72,34 @@ VALUES
 ('PhoneMaker X8', 'Large screen phone', 2, 2, 'PHONE-008', 950, 12, 1, 1, GETDATE()),
 ('PhoneMaker X9', 'Battery phone', 2, 2, 'PHONE-009', 650, 28, 1, 0, GETDATE()),
 ('PhoneMaker X10', 'Entry-level phone', 2, 2, 'PHONE-010', 250, 50, 1, 0, GETDATE());
+
+-- === SẢN PHẨM MẪU: IPHONE 16 ===
+-- Thêm sản phẩm Iphone 16
+INSERT INTO Products (ProductName, Description, CategoryId, BrandId, SKU, Price, StockQuantity, IsActive, IsFeatured, CreatedDate)
+VALUES
+(N'Iphone 16', N'iPhone 16 Pro Max sở hữu chipset A18 Pro mạnh mẽ giúp xử lý nhanh mọi tác vụ, camera 48 MP zoom quang 5x cho ảnh nét, màn hình 6.9 inch sống động. Pin dung lượng cao của máy hỗ trợ phát video tới 33 tiếng, đáp ứng nhu cầu giải trí liên tục suốt ngày dài. Cùng với đó là thiết kế khung Titanium bền nhẹ, mang lại cảm giác sang trọng và chắc chắn khi cầm.', 2, 6, 'IP16-001', 30090000, 18, 1, 1, GETDATE());
+
+-- Giả sử ProductId của Iphone 16 là 20 (sau các sản phẩm mẫu trước đó)
+-- Thêm các phiên bản màu/dung lượng
+INSERT INTO ProductVariants (ProductId, VariantName, VariantValue, PriceAdjustment, StockQuantity, IsActive) VALUES
+(20, N'Màu', N'Titan Sa Mạc 256GB', 0, 6, 1),
+(20, N'Màu', N'Titan Sa Mạc 512GB', 6700000, 4, 1),
+(20, N'Màu', N'Titan Sa Mạc 1T', 12600000, 2, 1),
+(20, N'Màu', N'Titan Trắng 256GB', 200000, 2, 1),
+(20, N'Màu', N'Titan Trắng 512GB', 7500000, 2, 1),
+(20, N'Màu', N'Titan Trắng 1T', 12900000, 1, 1),
+(20, N'Màu', N'TiTan Đen 256GB', 200000, 1, 1),
+(20, N'Màu', N'TiTan Đen 512GB', 7500000, 1, 1),
+(20, N'Màu', N'TiTan Đen 1T', 12900000, 1, 1);
+
+-- Thêm hình ảnh sản phẩm
+INSERT INTO ProductImages (ProductId, ImageUrl, AltText, IsPrimary, DisplayOrder, CreatedDate) VALUES
+(20, N'Images/iphone-16-pro-max.webp', N'Iphone 16 Pro Max', 1, 1, GETDATE()),
+(20, N'Images/iphone-16-pro-max-2.webp', N'Iphone 16 Pro Max góc 2', 0, 2, GETDATE()),
+(20, N'Images/iphone-16-pro-max-3.webp', N'Iphone 16 Pro Max góc 3', 0, 3, GETDATE()),
+(20, N'Images/iphone-16-pro-max-4.webp', N'Iphone 16 Pro Max góc 4', 0, 4, GETDATE()),
+(20, N'Images/iphone-16-pro-max-5.webp', N'Iphone 16 Pro Max góc 5', 0, 5, GETDATE()),
+(20, N'Images/iphone-16-pro-max-6.webp', N'Iphone 16 Pro Max góc 6', 0, 6, GETDATE());
 
 -- === PRODUCT VARIANTS (example for first laptop and phone) ===
 INSERT INTO ProductVariants (ProductId, VariantName, VariantValue, PriceAdjustment, StockQuantity, IsActive)

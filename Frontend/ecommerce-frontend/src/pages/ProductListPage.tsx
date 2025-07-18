@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -26,6 +27,7 @@ const ProductListPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFilters = async () => {
@@ -172,7 +174,7 @@ const ProductListPage: React.FC = () => {
                     <Typography variant="body2" color={product.stockQuantity > 0 ? 'success.main' : 'error.main'}>
                       {product.stockQuantity > 0 ? 'Còn hàng' : 'Hết hàng'}
                     </Typography>
-                    <Button variant="outlined" fullWidth sx={{ mt: 1 }}>
+                    <Button variant="outlined" fullWidth sx={{ mt: 1 }} onClick={() => navigate(`/products/${product.productId}`)}>
                       Xem chi tiết
                     </Button>
                   </CardContent>
